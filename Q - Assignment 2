@@ -1,0 +1,133 @@
+#include <iostream>
+using namespace std;
+
+class Student {
+private:
+    char studentName[50];
+    int rollNumber;
+    float studentCGPA;
+    char enrolledCourses[5][30];
+    int courseCount;
+
+    void copyString(char dest[], const char src[]) {
+        int i = 0;
+        while (src[i] != '\0') {
+            dest[i] = src[i];
+            i++;
+        }
+        dest[i] = '\0';
+    }
+
+public:
+    Student() {
+        copyString(studentName, "Unknown");
+        rollNumber = 0;
+        studentCGPA = 0.0;
+        courseCount = 0;
+    }
+
+    Student(const char name[], int roll, float cgpa) {
+        copyString(studentName, name);
+        rollNumber = roll;
+        courseCount = 0;
+        if (cgpa >= 0.0 && cgpa <= 10.0)
+            studentCGPA = cgpa;
+        else
+            studentCGPA = 0.0;
+    }
+
+    Student(const Student &other) {
+        copyString(studentName, other.studentName);
+        rollNumber = other.rollNumber;
+        studentCGPA = other.studentCGPA;
+        courseCount = other.courseCount;
+        for (int i = 0; i < courseCount; i++) {
+            copyString(enrolledCourses[i], other.enrolledCourses[i]);
+        }
+    }
+
+    ~Student() {}
+
+    bool addCourse(const char course[]) {
+        if (courseCount >= 5) return false;
+        copyString(enrolledCourses[courseCount], course);
+        courseCount++;
+        return true;
+    }
+
+    bool updateCGPA(float newCGPA) {
+        if (newCGPA < 0.0 || newCGPA > 10.0) return false;
+        studentCGPA = newCGPA;
+        return true;
+    }
+
+    int getRollNumber() const {
+        return rollNumber;
+    }
+
+    void displayInfo() const {
+        cout << "Name: " << studentName << endl;
+        cout << "Roll Number: " << rollNumber << endl;
+        cout << "CGPA: " << studentCGPA << endl;
+        cout << "Courses: ";
+        for (int i = 0; i < courseCount; i++) {
+            cout << enrolledCourses[i] << " ";
+        }
+        cout << endl << endl;
+    }
+};
+
+class StudentManagementSystem {
+private:
+    Student students[100];
+    int studentCount;
+
+public:
+    StudentManagementSystem() {
+        studentCount = 0;
+    }
+
+    bool addStudent(const char name[], int roll, float cgpa) {
+        if (studentCount >= 100) return false;
+        students[studentCount] = Student(name, roll, cgpa);
+        studentCount++;
+        return true;
+    }
+
+    Student* findStudentByRoll(int roll) {
+        for (int i = 0; i < studentCount; i++) {
+            if (students[i].getRollNumber() == roll)
+                return &students[i];
+        }
+        return nullptr;
+    }
+
+    void displayAllStudents() const {
+        for (int i = 0; i < studentCount; i++) {
+            students[i].displayInfo();
+        }
+    }
+};
+
+int main() {
+    StudentManagementSystem sms;
+
+    sms.addStudent("Amit Sharma", 101, 8.4);
+    sms.addStudent("Riya Verma", 102, 9.2);
+
+    Student* s1 = sms.findStudentByRoll(101);
+    if (s1 != nullptr) {
+        s1->addCourse("Math");
+        s1->addCourse("Physics");
+        s1->updateCGPA(8.8);
+    }
+
+    Student* s2 = sms.findStudentByRoll(102);
+    if (s2 != nullptr) {
+        s2->addCourse("Chemistry");
+    }
+
+    sms.displayAllStudents();
+
+    return 0;
+}
