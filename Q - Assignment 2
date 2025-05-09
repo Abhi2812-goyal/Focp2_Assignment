@@ -1,133 +1,85 @@
 #include <iostream>
 using namespace std;
 
-class Student {
-private:
-    char studentName[50];
-    int rollNumber;
-    float studentCGPA;
-    char enrolledCourses[5][30];
-    int courseCount;
-
-    void copyString(char dest[], const char src[]) {
-        int i = 0;
-        while (src[i] != '\0') {
-            dest[i] = src[i];
-            i++;
-        }
-        dest[i] = '\0';
-    }
-
+class Person {
 public:
-    Student() {
-        copyString(studentName, "Unknown");
-        rollNumber = 0;
-        studentCGPA = 0.0;
-        courseCount = 0;
+    char name[50];
+    int age;
+    char id[20];
+    char contact[30];
+
+    Person(const char* n, int a, const char* i, const char* c) {
+        strcpy(name, n);
+        age = a;
+        strcpy(id, i);
+        strcpy(contact, c);
     }
 
-    Student(const char name[], int roll, float cgpa) {
-        copyString(studentName, name);
-        rollNumber = roll;
-        courseCount = 0;
-        if (cgpa >= 0.0 && cgpa <= 10.0)
-            studentCGPA = cgpa;
-        else
-            studentCGPA = 0.0;
+    virtual void displayDetails() {
+        cout << name << " " << age << " " << id << " " << contact << endl;
     }
 
-    Student(const Student &other) {
-        copyString(studentName, other.studentName);
-        rollNumber = other.rollNumber;
-        studentCGPA = other.studentCGPA;
-        courseCount = other.courseCount;
-        for (int i = 0; i < courseCount; i++) {
-            copyString(enrolledCourses[i], other.enrolledCourses[i]);
-        }
-    }
-
-    ~Student() {}
-
-    bool addCourse(const char course[]) {
-        if (courseCount >= 5) return false;
-        copyString(enrolledCourses[courseCount], course);
-        courseCount++;
-        return true;
-    }
-
-    bool updateCGPA(float newCGPA) {
-        if (newCGPA < 0.0 || newCGPA > 10.0) return false;
-        studentCGPA = newCGPA;
-        return true;
-    }
-
-    int getRollNumber() const {
-        return rollNumber;
-    }
-
-    void displayInfo() const {
-        cout << "Name: " << studentName << endl;
-        cout << "Roll Number: " << rollNumber << endl;
-        cout << "CGPA: " << studentCGPA << endl;
-        cout << "Courses: ";
-        for (int i = 0; i < courseCount; i++) {
-            cout << enrolledCourses[i] << " ";
-        }
-        cout << endl << endl;
+    virtual float calculatePayment() {
+        return 0;
     }
 };
 
-class StudentManagementSystem {
-private:
-    Student students[100];
-    int studentCount;
-
+class Student : public Person {
 public:
-    StudentManagementSystem() {
-        studentCount = 0;
+    char enrollmentDate[20];
+    char program[30];
+    float gpa;
+
+    Student(const char* n, int a, const char* i, const char* c, const char* e, const char* p, float g)
+        : Person(n, a, i, c) {
+        strcpy(enrollmentDate, e);
+        strcpy(program, p);
+        gpa = g;
     }
 
-    bool addStudent(const char name[], int roll, float cgpa) {
-        if (studentCount >= 100) return false;
-        students[studentCount] = Student(name, roll, cgpa);
-        studentCount++;
-        return true;
+    void displayDetails() {
+        Person::displayDetails();
+        cout << enrollmentDate << " " << program << " " << gpa << endl;
     }
 
-    Student* findStudentByRoll(int roll) {
-        for (int i = 0; i < studentCount; i++) {
-            if (students[i].getRollNumber() == roll)
-                return &students[i];
-        }
-        return nullptr;
+    float calculatePayment() {
+        return 10000;
+    }
+};
+
+class Professor : public Person {
+public:
+    char department[30];
+    char specialization[30];
+    char hireDate[20];
+
+    Professor(const char* n, int a, const char* i, const char* c, const char* d, const char* s, const char* h)
+        : Person(n, a, i, c) {
+        strcpy(department, d);
+        strcpy(specialization, s);
+        strcpy(hireDate, h);
     }
 
-    void displayAllStudents() const {
-        for (int i = 0; i < studentCount; i++) {
-            students[i].displayInfo();
-        }
+    void displayDetails() {
+        Person::displayDetails();
+        cout << department << " " << specialization << " " << hireDate << endl;
+    }
+
+    float calculatePayment() {
+        return 50000;
     }
 };
 
 int main() {
-    StudentManagementSystem sms;
+    Student s1("Amit", 20, "S01", "123456", "2023", "BSc", 3.5);
+    Student s2("Neha", 21, "S02", "789012", "2023", "BCom", 3.8);
+    Professor p1("Dr. Roy", 50, "P01", "roy@mail.com", "CS", "AI", "2010");
+    Professor p2("Dr. Mehta", 45, "P02", "mehta@mail.com", "Math", "Stats", "2012");
 
-    sms.addStudent("Amit Sharma", 101, 8.4);
-    sms.addStudent("Riya Verma", 102, 9.2);
-
-    Student* s1 = sms.findStudentByRoll(101);
-    if (s1 != nullptr) {
-        s1->addCourse("Math");
-        s1->addCourse("Physics");
-        s1->updateCGPA(8.8);
-    }
-
-    Student* s2 = sms.findStudentByRoll(102);
-    if (s2 != nullptr) {
-        s2->addCourse("Chemistry");
-    }
-
-    sms.displayAllStudents();
+    s1.displayDetails();
+    s2.displayDetails();
+    p1.displayDetails();
+    p2.displayDetails();
 
     return 0;
 }
